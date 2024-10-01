@@ -24,19 +24,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require('../config.php');
+require('../../config.php');
 require_once($CFG->dirroot . '/user/editlib.php');
 require_once($CFG->libdir . '/authlib.php');
+require_once($CFG->dirroot . '/login/lib.php');
+require_once($CFG->dirroot . '/local/login/signup_form.php');
 require_once('lib.php');
 
 if (!$authplugin = signup_is_enabled()) {
     throw new \moodle_exception('notlocalisederrormessage', 'error', '', 'Sorry, you may not use this page.');
 }
 
-$PAGE->set_url('/login/signup.php');
+$PAGE->set_url('/local/login/signup.php');
 $PAGE->set_context(context_system::instance());
 
-// If wantsurl is empty or /login/signup.php, override wanted URL.
+// If wantsurl is empty or /local/login/signup.php, override wanted URL.
 // We do not want to end up here again if user clicks "Login".
 if (empty($SESSION->wantsurl)) {
     $SESSION->wantsurl = $CFG->wwwroot . '/';
@@ -51,7 +53,7 @@ if (isloggedin() and !isguestuser()) {
     // Prevent signing up when already logged in.
     echo $OUTPUT->header();
     echo $OUTPUT->box_start();
-    $logout = new single_button(new moodle_url('/login/logout.php',
+    $logout = new single_button(new moodle_url('/local/login/logout.php',
         array('sesskey' => sesskey(), 'loginpage' => 1)), get_string('logout'), 'post');
     $continue = new single_button(new moodle_url('/'), get_string('cancel'), 'get');
     echo $OUTPUT->confirm(get_string('cannotsignup', 'error', fullname($USER)), $logout, $continue);
@@ -77,7 +79,7 @@ if (\core_auth\digital_consent::is_age_digital_consent_verification_enabled()) {
 // Can be used to force additional actions before sign up such as acceptance of policies, validations, etc.
 core_login_pre_signup_requests();
 
-$mform_signup = $authplugin->signup_form();
+$mform_signup = new local_login_signup_form(null, null, 'post', '', array('autocomplete'=>'on'));
 
 if ($mform_signup->is_cancelled()) {
     redirect(get_login_url());
