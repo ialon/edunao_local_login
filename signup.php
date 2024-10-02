@@ -53,7 +53,7 @@ if (isloggedin() and !isguestuser()) {
     // Prevent signing up when already logged in.
     echo $OUTPUT->header();
     echo $OUTPUT->box_start();
-    $logout = new single_button(new moodle_url('/local/login/logout.php',
+    $logout = new single_button(new moodle_url('/login/logout.php',
         array('sesskey' => sesskey(), 'loginpage' => 1)), get_string('logout'), 'post');
     $continue = new single_button(new moodle_url('/'), get_string('cancel'), 'get');
     echo $OUTPUT->confirm(get_string('cannotsignup', 'error', fullname($USER)), $logout, $continue);
