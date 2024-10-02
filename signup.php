@@ -91,8 +91,14 @@ if ($mform_signup->is_cancelled()) {
     // Plugins can perform post sign up actions once data has been validated.
     core_login_post_signup_requests($user);
 
-    $authplugin->user_signup($user, true); // prints notice and link to login/index.php
-    exit; //never reached
+    // Allows user to login after sign up.
+    if ($authplugin->user_signup($user, false)) {
+        $user = $DB->get_record('user', array('username' => $user->username), '*', MUST_EXIST);
+        complete_user_login($user);
+        redirect($SESSION->wantsurl);
+    } else {
+        redirect(get_login_url());
+    }
 }
 
 
